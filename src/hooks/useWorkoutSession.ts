@@ -37,7 +37,7 @@ const createPhaseOrder = (workout: WorkoutRoutine): PhaseEntry[] => {
 };
 
 export const useWorkoutSession = (workout: WorkoutRoutine | undefined) => {
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [state, setState] = useState<SessionState | null>(null);
 

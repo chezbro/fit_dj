@@ -9,6 +9,22 @@ interface SpotifyTrack {
   name: string;
 }
 
+interface SpotifyPlaylistItem {
+  track: {
+    uri: string;
+    name: string;
+    id: string;
+  };
+}
+
+interface SpotifyPlaylistResponse {
+  items: SpotifyPlaylistItem[];
+}
+
+interface SpotifyAudioFeaturesResponse {
+  tempo: number;
+}
+
 export class SpotifyController {
   private accessToken: string | null = null;
   private playlist: SpotifyTrack[] = [];
@@ -43,15 +59,18 @@ export class SpotifyController {
       await this.connect();
     }
     if (!this.accessToken) return;
-    const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-      headers: {
-        Authorization: `Bearer ${this.accessToken}`,
+    const response = await axios.get<SpotifyPlaylistResponse>(
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+        params: { fields: 'items(track(uri,name,id))' },
       },
-      params: { fields: 'items(track(uri,name,id))' },
-    });
+    );
     this.playlist = await Promise.all(
-      response.data.items.map(async (item: any) => {
-        const audioFeatures = await axios.get(
+      response.data.items.map(async (item) => {
+        const audioFeatures = await axios.get<SpotifyAudioFeaturesResponse>(
           `https://api.spotify.com/v1/audio-features/${item.track.id}`,
           { headers: { Authorization: `Bearer ${this.accessToken}` } },
         );
@@ -59,7 +78,7 @@ export class SpotifyController {
           uri: item.track.uri,
           tempo: audioFeatures.data.tempo,
           name: item.track.name,
-        } as SpotifyTrack;
+        } satisfies SpotifyTrack;
       }),
     );
     this.currentIndex = 0;

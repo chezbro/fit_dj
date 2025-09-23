@@ -13,7 +13,7 @@ export class AudioMixer {
 
   async loadMusic(uri: string) {
     await this.unloadChannel(MUSIC_TRACK);
-    const { sound } = await Audio.Sound.createAsync({ uri }, {}, false);
+    const { sound } = await Audio.Sound.createAsync({ uri }, { shouldPlay: false });
     this.channels[MUSIC_TRACK] = sound;
   }
 
@@ -73,4 +73,7 @@ export class AudioMixer {
   }
 }
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), ms);
+  });
