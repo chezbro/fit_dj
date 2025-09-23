@@ -11,9 +11,15 @@ const WorkoutContext = createContext<WorkoutContextValue | undefined>(undefined)
 
 export const WorkoutProvider = ({ children }: { children: ReactNode }) => {
   const value = useMemo(() => {
-    const summaries: WorkoutSummary[] = WORKOUT_ROUTINES.map(
-      ({ cooldown, mainSets, warmup, ...summary }) => summary,
-    );
+    const summaries = WORKOUT_ROUTINES.map<WorkoutSummary>((workout) => ({
+      id: workout.id,
+      title: workout.title,
+      description: workout.description,
+      duration: workout.duration,
+      level: workout.level,
+      focus: workout.focus,
+      heroImage: workout.heroImage,
+    }));
 
     const getWorkoutById = (id: string) => WORKOUT_ROUTINES.find((workout) => workout.id === id);
 
